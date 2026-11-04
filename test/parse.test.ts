@@ -130,7 +130,7 @@ describe("parsePrompt phrasings", () => {
     ].join("\n"));
     expect(m.rules.map((r) => r.label)).toEqual(["spam", "promo", "promo"]);
     expect(m.rules[1]?.conditions[0]?.[0]).toMatchObject({ negated: true });
-    expect(m.inputs.map((i) => i.name)).toContain("Messages contain an unsubscribe link");
+    expect(m.inputs.map((i) => i.name)).toContain("messages contain an unsubscribe link");
     expect(m.default?.label).toBe("inbox");
     expect(m.uninterpretable).toEqual([]);
   });

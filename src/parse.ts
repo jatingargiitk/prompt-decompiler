@@ -510,7 +510,7 @@ export function parsePrompt(text: string): Model {
     const key = canonical(a.phrase);
     let input = boolByKey.get(key);
     if (!input) {
-      input = { id: newId(), name: a.phrase.replace(/^the\s+/i, "the "), short: "", kind: "bool", values: ["true", "false"], declared: false, span };
+      input = { id: newId(), name: a.phrase.replace(/^the\s+/i, "the ").replace(/^[A-Z](?=[a-z])/, (ch) => ch.toLowerCase()), short: "", kind: "bool", values: ["true", "false"], declared: false, span };
       inputs.push(input);
       boolByKey.set(key, input);
     } else if (!a.negated && input.span.start > span.start) {
