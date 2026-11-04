@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Smoke-test the packed CLI on the example
+        run: |
+          npm pack
+          dir=$(mktemp -d)
+          npm install --prefix "$dir" ./prompt-decompiler-*.tgz
+          bin="$dir/node_modules/.bin/prompt-decompiler"
+          "$bin" --version
+          # The example prompt leaves conflicts open, so --check must exit 1.
+          set +e
+          "$bin" examples/support-router.md --check --no-color
+          code=$?
+          set -e
+          test "$code" -eq 1
+          "$bin" examples/support-router.md --confirm examples/support-router.decisions.yaml --format json \
+            | node -e 'const r=JSON.parse(require("fs").readFileSync(0,"utf8")); if (r.summary.unresolvedConflicts!==0 || r.summary.gaps!==0) process.exit(1)'
+          "$bin" examples/support-router.md --tests "$dir/tests.jsonl" > /dev/null
+          test "$(wc -l < "$dir/tests.jsonl")" -eq 15
+          printf 'y\ny\n' | "$bin" review examples/support-router.md --confirm "$dir/d.yaml"
+          grep -q 'R2: accept' "$dir/d.yaml"
