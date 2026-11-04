@@ -55,4 +55,13 @@ describe("segment", () => {
     expect(clauses.map((c) => c.span.text)).toEqual(["First line.", "If A is true, route to `x`."]);
     expect(clauses[1]?.span.line).toBe(2);
   });
+
+  it("ends a clause at a line break when the next line starts a new sentence", () => {
+    const text = "Labels: spam, promo\nLabel it spam if the sender is unknown.\nIf the sender is new,\nlabel it promo.";
+    expect(segment(text).map((c) => c.text)).toEqual([
+      "Labels: spam, promo",
+      "Label it spam if the sender is unknown.",
+      "If the sender is new, label it promo.",
+    ]);
+  });
 });

@@ -104,6 +104,23 @@ function sentenceBreaks(s: string): number[] {
   return breaks;
 }
 
+/**
+ * A line break also ends a clause when the next line starts like a new sentence (capital, digit, quote,
+ * backtick) and the previous line does not end mid-phrase (comma, dash, "and"/"or"). This keeps unpunctuated
+ * lines such as "Labels: a, b, c" apart while still joining hard-wrapped sentences.
+ */
+function lineBreaks(s: string): number[] {
+  const breaks: number[] = [];
+  for (let i = s.indexOf("\n"); i !== -1; i = s.indexOf("\n", i + 1)) {
+    const before = s.slice(0, i).trimEnd();
+    const after = s.slice(i + 1).trimStart();
+    if (!before || !after) continue;
+    if (/[,\-–—(]$/.test(before) || /\b(and|or|the|a|an|to|of)$/i.test(before)) continue;
+    if (/^["'`(A-Z0-9]/.test(after)) breaks.push(i + 1);
+  }
+  return breaks;
+}
+
 export function normalizeClauseText(s: string): string {
   return s
     .replace(/\*\*|__/g, "")
@@ -118,8 +135,9 @@ export function segment(text: string): Clause[] {
   const starts = lineStarts(text);
   const clauses: Clause[] = [];
   blocks(text, starts).forEach((block, blockIndex) => {
-    const body = text.slice(block.start, block.end).replace(/[\r\n]/g, " ");
-    const cuts = [0, ...sentenceBreaks(body), body.length];
+    const original = text.slice(block.start, block.end);
+    const body = original.replace(/[\r\n]/g, " ");
+    const cuts = [...new Set([0, ...sentenceBreaks(body), ...lineBreaks(original), body.length])].sort((x, y) => x - y);
     let first = true;
     for (let i = 0; i + 1 < cuts.length; i++) {
       const raw = body.slice(cuts[i], cuts[i + 1]);
