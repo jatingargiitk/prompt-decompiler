@@ -115,7 +115,7 @@ function lineBreaks(s: string): number[] {
     const before = s.slice(0, i).trimEnd();
     const after = s.slice(i + 1).trimStart();
     if (!before || !after) continue;
-    if (/[,\-–—(]$/.test(before) || /\b(and|or|the|a|an|to|of)$/i.test(before)) continue;
+    if (/[,\-–—(]$/.test(before) || /\b(and|or|the|to|of)$/i.test(before)) continue;
     if (/^["'`(A-Z0-9]/.test(after)) breaks.push(i + 1);
   }
   return breaks;
