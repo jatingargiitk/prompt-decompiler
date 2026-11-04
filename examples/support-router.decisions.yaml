@@ -10,10 +10,10 @@ rules:
   R7: accept
   R8: accept
 conflicts:
-  - between: [billing, bugs]
-    winner: bugs
   - between: [bugs, account]
     winner: account
+  - between: [billing, bugs]
+    winner: bugs
   - between: [account, sales]
     winner: account
   - between: [billing, sales]
