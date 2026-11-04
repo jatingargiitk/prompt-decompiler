@@ -1,0 +1,21 @@
+# prompt-decompiler decisions. Edit by hand or with `prompt-decompiler review`.
+prompt_sha256: d80bef5599bf2c3e96fedae589c87efe4534db4900aaabea07afbbf452e35d54
+rules:
+  R1: accept
+  R2: accept
+  R3: accept
+  R4: accept
+  R5: accept
+  R6: accept
+  R7: accept
+  R8: accept
+conflicts:
+  - between: [billing, bugs]
+    winner: bugs
+  - between: [bugs, account]
+    winner: account
+  - between: [account, sales]
+    winner: account
+  - between: [billing, sales]
+    winner: sales
+default: general

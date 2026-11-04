@@ -198,7 +198,7 @@ export function summaryLine(r: Report): string {
   return [
     `${plural(s.rules, "rule")}, ${plural(s.inputs, "input")}, ${plural(s.combinations, "combination")} checked`,
     `${s.unresolvedConflicts} unresolved conflict${s.unresolvedConflicts === 1 ? "" : "s"}`,
-    `${s.resolvedConflicts} resolved by the prompt${r.analysis.conflicts.some((c) => c.by?.includes("human")) ? " or decisions" : ""}`,
+    `${s.resolvedConflicts} resolved by the prompt${r.analysis.conflicts.some((c) => c.by?.includes("decisions file")) ? " or decisions" : ""}`,
     plural(s.gaps, "missing default"),
     `${s.uninterpretable} uninterpretable clause${s.uninterpretable === 1 ? "" : "s"}`,
     ...(s.deadRules ? [plural(s.deadRules, "dead rule")] : []),

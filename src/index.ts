@@ -1,0 +1,10 @@
+export { segment } from "./segment.ts";
+export { parsePrompt } from "./parse.ts";
+export { analyze, evaluate, type Analysis, type ConflictDecision, type ConflictGroup, type GapGroup, type Outcome } from "./analyze.ts";
+export { applyDecisions, emptyDecisions, loadDecisions, parseDecisions, serializeDecisions, type Decisions } from "./decisions.ts";
+export { buildReport, hasOpenIssues, summarize, summaryLine, UNRESOLVED, type Report, type Row } from "./report.ts";
+export { renderHtml, renderJson, renderMarkdown, renderTable } from "./render.ts";
+export { buildTestCases, toJsonl, toPromptfoo, type TestCase } from "./witness.ts";
+export { review, type ReviewIO } from "./review.ts";
+export { main } from "./main.ts";
+export type * from "./types.ts";

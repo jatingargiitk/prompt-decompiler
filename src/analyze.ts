@@ -166,7 +166,7 @@ export function evaluate(model: Model, a: Assignment, decisions: ConflictDecisio
     const decision = decisions.find((d) => sameSet([...new Set(d.between.map(asLabel))], tied));
     if (decision) {
       used?.add(decision);
-      keep(remaining.filter((r) => r.label === asLabel(decision.winner)), "confirmed by a human decision");
+      keep(remaining.filter((r) => r.label === asLabel(decision.winner)), "decisions file");
     }
   }
   const finalLabels = labels(remaining);

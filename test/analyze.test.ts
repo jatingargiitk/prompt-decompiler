@@ -142,7 +142,7 @@ describe("decisions", () => {
     expect(r.gaps).toEqual([]);
     expect(r.defaultCount).toBeGreaterThan(0);
     expect(r.unusedDecisions).toEqual([]);
-    const crash = r.conflicts.find((c) => c.by?.includes("human") && c.winner === "bugs");
+    const crash = r.conflicts.find((c) => c.by?.includes("decisions file") && c.winner === "bugs");
     expect(crash).toBeDefined();
   });
 
