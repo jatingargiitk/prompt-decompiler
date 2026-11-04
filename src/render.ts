@@ -151,11 +151,20 @@ function esc(s: string): string {
  */
 export function renderHtml(r: Report, prompt: string): string {
   const { model } = r;
-  // Mark every rule, default and uninterpretable span in the prompt text.
+  // Mark every rule, default, uninterpretable and priority span in the prompt text. Rows point at marks by id.
   const marks: { start: number; end: number; id: string; cls: string }[] = [];
-  for (const rule of model.rules) marks.push({ start: rule.span.start, end: rule.span.end, id: rule.id, cls: "rule" });
-  if (model.default?.from === "prompt") marks.push({ start: model.default.span.start, end: model.default.span.end, id: "DEF", cls: "rule" });
-  model.uninterpretable.forEach((f, i) => marks.push({ start: f.span.start, end: f.span.end, id: `U${i + 1}`, cls: "bad" }));
+  const idOf = new Map<string, string>();
+  const add = (span: { start: number; end: number }, id: string, cls: string) => {
+    const key = `${span.start}:${span.end}`;
+    if (idOf.has(key)) return;
+    idOf.set(key, id);
+    marks.push({ start: span.start, end: span.end, id, cls });
+  };
+  for (const rule of model.rules) add(rule.span, rule.id, "rule");
+  if (model.default?.from === "prompt") add(model.default.span, "DEF", "rule");
+  model.uninterpretable.forEach((f, i) => add(f.span, `U${i + 1}`, "bad"));
+  for (const row of r.rows) for (const span of row.spans) add(span, `P${idOf.size + 1}`, "rule");
+  const rowIds = (row: Row) => [...new Set(row.spans.map((sp) => idOf.get(`${sp.start}:${sp.end}`)).filter((x) => x !== undefined))];
   marks.sort((a, b) => a.start - b.start);
   let html = "";
   let pos = 0;
@@ -170,7 +179,7 @@ export function renderHtml(r: Report, prompt: string): string {
   const head = `<tr><th>ID</th>${model.inputs.map((i) => `<th title="${esc(i.name)}">${esc(i.short)}</th>`).join("")}<th>label</th><th>why</th></tr>`;
   const rows = r.rows
     .map((row) => {
-      const ids = row.kind === "default" ? ["DEF"] : row.rules;
+      const ids = rowIds(row);
       return `<tr class="${row.kind}${row.unresolved ? " unresolved" : ""}" data-spans="${esc(ids.join(" "))}"><td>${esc(row.id)}</td>${row.cells.map((x) => `<td>${esc(x)}</td>`).join("")}<td>${esc(row.outcome)}</td><td>${esc(row.note)}</td></tr>`;
     })
     .join("\n");
@@ -181,10 +190,10 @@ export function renderHtml(r: Report, prompt: string): string {
 <html lang="en"><head><meta charset="utf-8"><title>${esc(r.source)} · prompt-decompiler</title>
 <style>
 body{font:14px/1.45 system-ui,sans-serif;margin:0;display:flex;gap:1rem;padding:1rem;color:#222}
-#prompt{flex:1;min-width:20rem}#table{flex:2;overflow:auto}
+#prompt{flex:0 1 30rem;min-width:18rem}#table{flex:1;min-width:0;overflow:auto}
 pre{white-space:pre-wrap;background:#f7f7f7;padding:1rem;border-radius:6px}
 mark{background:#eef;border-radius:3px}mark.bad{background:#fde2e2}mark.on{background:#ffd54f;outline:2px solid #f9a825}
-table{border-collapse:collapse}td,th{border:1px solid #ddd;padding:.25rem .5rem;text-align:left;white-space:nowrap}
+table{border-collapse:collapse}td,th{border:1px solid #ddd;padding:.25rem .5rem;text-align:left;white-space:nowrap}td:last-child{white-space:normal;min-width:12rem}
 tr[data-spans]{cursor:pointer}tr.unresolved td{color:#b00020;font-weight:600}tr.conflict:not(.unresolved){background:#fff8e1}
 tr.sel{outline:2px solid #f9a825}li[data-spans]{cursor:pointer}
 </style></head><body>

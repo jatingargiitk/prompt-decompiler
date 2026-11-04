@@ -81,7 +81,8 @@ describe("renderers", () => {
   it("writes a self-contained HTML page that links rows to source spans", () => {
     const html = renderHtml(report, example);
     expect(html).toContain('<mark class="rule" data-span="R1" title="R1">If the ticket mentions a refund, route it to `billing`.</mark>');
-    expect(html).toContain('data-spans="R3 R4"');
+    expect(html).toContain('data-spans="R3 R4 P11"');
+    expect(html).toContain('<mark class="rule" data-span="P11" title="P11">`account` takes precedence over `billing`.</mark>');
     expect(html).toContain('<mark class="bad" data-span="U1"');
     expect(html).not.toMatch(/<script src=|<link /);
     expect(renderHtml(report, "<b>x</b>")).toContain("&lt;b&gt;x&lt;/b&gt;");
