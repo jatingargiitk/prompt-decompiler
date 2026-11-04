@@ -28,7 +28,8 @@ export function renderTable(r: Report, opts: { color?: boolean } = {}): string {
   out.push(c("bold", `${r.source}`) + c("dim", `  (sha256 ${model.promptSha256.slice(0, 12)})`), "");
 
   out.push(c("bold", "Inputs"));
-  model.inputs.forEach((input, i) => out.push(`  ${columnLetter(i)}  ${input.short.padEnd(18)} ${inputDesc(input)}  ${c("dim", lineRef(input.span))}`));
+  const nameWidth = Math.max(0, ...model.inputs.map((i) => i.short.length)) + 1;
+  model.inputs.forEach((input, i) => out.push(`  ${columnLetter(i)}  ${input.short.padEnd(nameWidth)} ${inputDesc(input)}  ${c("dim", lineRef(input.span))}`));
   if (!model.inputs.length) out.push("  (none found)");
   out.push("");
 

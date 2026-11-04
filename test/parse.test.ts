@@ -170,4 +170,9 @@ describe("parsePrompt phrasings", () => {
     expect(m.uninterpretable[0]?.reason).toMatch(/second default/);
     expect(m.ignored.map((f) => f.reason)).toContain("output-format instruction");
   });
+
+  it("cuts long input names at a word boundary", () => {
+    const m = parsePrompt("Labels: spam, inbox\nIf the subject contains a discount code, label it spam.\nOtherwise, label it inbox.");
+    expect(m.inputs.map((i) => i.short)).toEqual(["subject_contains"]);
+  });
 });

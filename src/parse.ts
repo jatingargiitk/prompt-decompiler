@@ -331,7 +331,14 @@ function shortNames(inputs: Input[], subjects: Map<string, string>): void {
   for (const input of inputs) {
     let ws = input.kind === "choice" ? contentWords(subjects.get(input.id) ?? input.name) : contentWords(input.name);
     if (input.kind === "bool" && ws.length > 1 && (leadCounts.get(ws[0] ?? "") ?? 0) >= 2) ws = ws.slice(1);
-    let base = ws.slice(0, 3).join("_").slice(0, 22) || input.id;
+    // Up to three words, cut at a word boundary so names stay readable.
+    let base = "";
+    for (const w of ws.slice(0, 3)) {
+      const next = base ? `${base}_${w}` : w;
+      if (base && next.length > 22) break;
+      base = next;
+    }
+    base ||= input.id;
     if (used.has(base)) {
       let n = 2;
       while (used.has(`${base}_${n}`)) n++;
